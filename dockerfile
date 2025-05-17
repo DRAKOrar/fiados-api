@@ -1,28 +1,28 @@
-# Usa una imagen base con Java 21 y Gradle preinstalado
-FROM eclipse-temurin:21-jdk as build
+# Etapa de compilación
+FROM eclipse-temurin:21-jdk AS build
 
-# Establece el directorio de trabajo
+# Directorio de trabajo
 WORKDIR /app
 
-# Copia los archivos del proyecto
+# Copiar todo el proyecto
 COPY . .
 
-# Da permisos al wrapper de Gradle
+# Permisos al wrapper de gradle
 RUN chmod +x ./gradlew
 
-# Construye la aplicación (sin tests ni chequeos para producción rápida)
+# Construir el proyecto (opcionalmente omitiendo tests)
 RUN ./gradlew clean build -x check -x test
 
-# Etapa final: usar una imagen más ligera para ejecutar
-FROM eclipse-temurin:21-jdk as runtime
+# Etapa de ejecución (más ligera)
+FROM eclipse-temurin:21-jdk AS runtime
 
 WORKDIR /app
 
-# Copia el JAR construido
+# Copia el JAR construido desde la etapa anterior
 COPY --from=build /app/build/libs/*.jar app.jar
 
-# Expone el puerto (ajusta si tu app usa otro)
+# Puerto expuesto
 EXPOSE 8080
 
-# Comando de arranque
+# Comando para ejecutar la app
 CMD ["java", "-jar", "app.jar"]
