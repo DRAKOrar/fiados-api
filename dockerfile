@@ -1,28 +1,26 @@
-# Etapa de compilación
-FROM eclipse-temurin:21-jdk AS build
+FROM eclipse-temurin:21-jdk as builder
 
-# Directorio de trabajo
 WORKDIR /app
 
-# Copiar todo el proyecto
+# Copiar archivos
 COPY . .
 
-# Permisos al wrapper de gradle
-RUN chmod +x ./gradlew
+# Asignar permisos
+RUN chmod +x gradlew
 
-# Construir el proyecto (opcionalmente omitiendo tests)
-RUN ./gradlew clean build -x check -x test
+# Construir el proyecto (sin test por ahora)
+RUN ./gradlew clean build -x test
 
-# Etapa de ejecución (más ligera)
-FROM eclipse-temurin:21-jdk AS runtime
+# Segunda etapa: imagen final más liviana
+FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
 
-# Copia el JAR construido desde la etapa anterior
-COPY --from=build /app/build/libs/*.jar app.jar
+# Copiar solo el JAR generado
+COPY --from=builder /app/build/libs/*.jar app.jar
 
-# Puerto expuesto
+# Exponer el puerto (ajústalo si usas otro)
 EXPOSE 8080
 
-# Comando para ejecutar la app
-CMD ["java", "-jar", "app.jar"]
+# Ejecutar el JAR
+ENTRYPOINT ["java", "-jar", "app.jar"]
