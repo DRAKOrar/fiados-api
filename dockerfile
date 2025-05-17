@@ -1,26 +1,23 @@
-FROM eclipse-temurin:21-jdk as builder
-
+# Etapa de construcción
+FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 
-# Copiar archivos
+# Copia todo el contenido del proyecto al contenedor
 COPY . .
 
-# Asignar permisos
+# Da permisos de ejecución a gradlew
 RUN chmod +x gradlew
 
-# Construir el proyecto (sin test por ahora)
-RUN ./gradlew clean build -x test
+# Build del proyecto sin tests (para acelerar)
+RUN ./gradlew clean build -x test -x check --stacktrace
 
-# Segunda etapa: imagen final más liviana
+# Etapa de ejecución
 FROM eclipse-temurin:21-jdk
-
 WORKDIR /app
 
-# Copiar solo el JAR generado
-COPY --from=builder /app/build/libs/*.jar app.jar
+# Copia el archivo jar generado en la etapa build
+COPY --from=build /app/build/libs/*.jar app.jar
 
-# Exponer el puerto (ajústalo si usas otro)
 EXPOSE 8080
 
-# Ejecutar el JAR
 ENTRYPOINT ["java", "-jar", "app.jar"]
