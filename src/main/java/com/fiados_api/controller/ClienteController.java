@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "https://f531-191-156-145-44.ngrok-free.app")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/clientes")
 @RequiredArgsConstructor
