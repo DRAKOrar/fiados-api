@@ -1,11 +1,11 @@
-# Etapa 1: Construcción con Gradle
-FROM gradle:7.6.1-jdk17 AS build
-COPY --chown=gradle:gradle src/main/java/com/fiados_api /app
+# Etapa 1: Construcción con Gradle Wrapper y Java 21
+FROM gradle:8.5-jdk21 AS build
+COPY --chown=gradle:gradle . /app
 WORKDIR /app
-RUN gradle build --no-daemon
+RUN ./gradlew build --no-daemon
 
-# Etapa 2: Imagen de ejecución con JDK
-FROM openjdk:17-jdk-slim
+# Etapa 2: Imagen de ejecución con JDK 21
+FROM eclipse-temurin:21-jdk
 EXPOSE 8080
-COPY --from=build /app/build/libs/*.jar /app/app.jar
+COPY --from=build /app/build/libs/fiados-api-0.0.1-SNAPSHOT.jar /app/app.jar
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
