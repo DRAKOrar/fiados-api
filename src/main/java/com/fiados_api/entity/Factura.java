@@ -1,12 +1,13 @@
 package com.fiados_api.entity;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -25,11 +26,12 @@ public class Factura {
     @Enumerated(EnumType.STRING)
     private EstadoFactura estado;
 
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cliente_id")
-    @JsonBackReference
-    @JsonIgnoreProperties("facturas") // Previene loops cuando cliente se serializa desde factura
+    @JsonIgnoreProperties({"facturas", "hibernateLazyInitializer", "handler"})
     private Cliente cliente;
+
 
     @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

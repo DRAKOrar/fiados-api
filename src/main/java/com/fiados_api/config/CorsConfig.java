@@ -15,7 +15,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // Permite peticiones desde el origen de Angular
-        config.addAllowedOrigin("http://localhost:4200/");
+        config.addAllowedOrigin("http://localhost:4200");
 
         // Permite los métodos HTTP necesarios
         config.addAllowedMethod("GET");
