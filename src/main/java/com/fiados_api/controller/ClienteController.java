@@ -1,7 +1,9 @@
 package com.fiados_api.controller;
 import com.fiados_api.entity.Cliente;
 import com.fiados_api.entity.EstadoFactura;
+import com.fiados_api.entity.Factura;
 import com.fiados_api.repository.ClienteRepository;
+import com.fiados_api.service.ReporteFacturaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.util.List;
 public class ClienteController {
     private final ClienteRepository clienteRepository;
 
+    private final ReporteFacturaService reporteFacturaService;
     @GetMapping
     public ResponseEntity<List<Cliente>> listar() {
         return ResponseEntity.ok(clienteRepository.findAll());
@@ -44,6 +47,20 @@ public class ClienteController {
     public ResponseEntity<Cliente> obtener(@PathVariable Long id) {
         return clienteRepository.findById(id)
                 .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/reporte-facturas")
+    public ResponseEntity<byte[]> generarReporteFacturasCliente(@PathVariable Long id) {
+        return clienteRepository.findById(id)
+                .map(cliente -> {
+                    List<Factura> facturas = cliente.getFacturas();
+                    byte[] pdf = reporteFacturaService.generarReporteDeFacturas(facturas, "Facturas de " + cliente.getNombre());
+                    return ResponseEntity.ok()
+                            .header("Content-Disposition", "attachment; filename=facturas_cliente_" + id + ".pdf")
+                            .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                            .body(pdf);
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 

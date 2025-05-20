@@ -24,6 +24,7 @@ repositories {
 }
 
 dependencies {
+	implementation 'com.itextpdf:itext7-core:8.0.1' // versión libre
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'

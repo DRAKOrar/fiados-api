@@ -4,6 +4,7 @@ import com.fiados_api.entity.EstadoFactura;
 import com.fiados_api.entity.Factura;
 import com.fiados_api.repository.ClienteRepository;
 import com.fiados_api.repository.FacturaRepository;
+import com.fiados_api.service.ReporteFacturaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.List;
 public class FacturaController {
     private final FacturaRepository facturaRepository;
     private final ClienteRepository clienteRepository;
+    private final ReporteFacturaService reporteFacturaService;
 
     @GetMapping
     public ResponseEntity<List<Factura>> listar() {
@@ -91,6 +93,30 @@ public class FacturaController {
             return ResponseEntity.ok().<Void>build(); // CAST explícito
         }).orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/{id}/reporte")
+    public ResponseEntity<byte[]> generarFacturaPDF(@PathVariable Long id) {
+        return facturaRepository.findById(id)
+                .map(factura -> {
+                    byte[] pdf = reporteFacturaService.generarReporteFactura(factura);
+                    return ResponseEntity.ok()
+                            .header("Content-Disposition", "attachment; filename=factura_" + id + ".pdf")
+                            .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                            .body(pdf);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/reporte")
+    public ResponseEntity<byte[]> generarReporteTodasFacturas() {
+        List<Factura> facturas = facturaRepository.findAll();
+        byte[] pdf = reporteFacturaService.generarReporteDeFacturas(facturas, "Listado de Facturas");
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=lista_facturas.pdf")
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
+
 
 
 }
