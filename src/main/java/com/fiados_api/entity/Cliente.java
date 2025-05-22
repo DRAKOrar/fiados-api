@@ -33,7 +33,11 @@ public class Cliente {
     @NotBlank(message = "La dirección es obligatoria")
     private String direccion;
 
+    @Column(nullable = false, unique = true)
+    @NotBlank(message = "La cédula es obligatoria")
     private String cedula;
+
+
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore

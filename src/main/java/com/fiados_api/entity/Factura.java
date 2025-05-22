@@ -24,7 +24,9 @@ public class Factura {
     private LocalDate fechaActualizacion;
 
     @Enumerated(EnumType.STRING)
-    private EstadoFactura estado;
+    @Column(nullable = false)
+    private EstadoFactura estado = EstadoFactura.ACTIVA;
+
 
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -38,4 +40,6 @@ public class Factura {
     private List<Producto> productos;
 
     private Double total;
+
+
 }

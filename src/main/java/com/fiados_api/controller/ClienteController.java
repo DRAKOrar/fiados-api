@@ -1,4 +1,5 @@
 package com.fiados_api.controller;
+import com.fiados_api.dto.EstadoFinancieroDTO;
 import com.fiados_api.entity.Cliente;
 import com.fiados_api.entity.EstadoFactura;
 import com.fiados_api.entity.Factura;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 
 @RestController
@@ -24,6 +26,13 @@ public class ClienteController {
     public ResponseEntity<List<Cliente>> listar() {
         return ResponseEntity.ok(clienteRepository.findAll());
     }
+
+    @GetMapping("/cedula-existe/{cedula}")
+    public ResponseEntity<Boolean> existeCedula(@PathVariable String cedula) {
+        boolean existe = clienteRepository.existsByCedula(cedula);
+        return ResponseEntity.ok(existe);
+    }
+    
 
 
     @PostMapping
@@ -56,13 +65,18 @@ public class ClienteController {
                 .map(cliente -> {
                     List<Factura> facturas = cliente.getFacturas();
                     byte[] pdf = reporteFacturaService.generarReporteDeFacturas(facturas, "Facturas de " + cliente.getNombre());
+
+                    // 👇 nombre del archivo usando el nombre del cliente
+                    String nombreArchivo = "facturas_" + cliente.getNombre().replaceAll("\\s+", "_") + ".pdf";
+
                     return ResponseEntity.ok()
-                            .header("Content-Disposition", "attachment; filename=facturas_cliente_" + id + ".pdf")
+                            .header("Content-Disposition", "attachment; filename=" + nombreArchivo)
                             .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
                             .body(pdf);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {

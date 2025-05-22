@@ -99,13 +99,21 @@ public class FacturaController {
         return facturaRepository.findById(id)
                 .map(factura -> {
                     byte[] pdf = reporteFacturaService.generarReporteFactura(factura);
+
+                    String nombreCliente = (factura.getCliente() != null && factura.getCliente().getNombre() != null)
+                            ? factura.getCliente().getNombre().replaceAll("[^a-zA-Z0-9]", "_")
+                            : "cliente_desconocido";
+
+                    String nombreArchivo = "factura_" + nombreCliente + "_" + factura.getId() + ".pdf";
+
                     return ResponseEntity.ok()
-                            .header("Content-Disposition", "attachment; filename=factura_" + id + ".pdf")
+                            .header("Content-Disposition", "attachment; filename=" + nombreArchivo)
                             .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
                             .body(pdf);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
 
     @GetMapping("/reporte")
     public ResponseEntity<byte[]> generarReporteTodasFacturas() {
