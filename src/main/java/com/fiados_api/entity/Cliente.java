@@ -35,6 +35,6 @@ public class Cliente {
     private String cedula;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+
     private List<Factura> facturas;
 }
