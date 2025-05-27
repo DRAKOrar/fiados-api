@@ -27,9 +27,9 @@ public class Factura {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
-    @JsonBackReference
-    @JsonIgnoreProperties("facturas") // Previene loops cuando cliente se serializa desde factura
+    @JsonIgnoreProperties("facturas") // Evita bucles, pero permite incluir el cliente en JSON
     private Cliente cliente;
+
 
     @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
