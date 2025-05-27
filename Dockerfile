@@ -2,7 +2,7 @@
 FROM gradle:8.5-jdk21 AS build
 COPY --chown=gradle:gradle . /app
 WORKDIR /app
-RUN ./gradlew build --no-daemon
+RUN ./gradlew clean build --no-daemon
 
 # Etapa 2: Imagen de ejecución con JDK 21
 FROM eclipse-temurin:21-jdk
